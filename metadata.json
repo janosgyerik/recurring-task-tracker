@@ -1,0 +1,5 @@
+{
+  "name": "Recurring Task Tracker",
+  "description": "A daily tracker for recurring tasks with customizable frequencies and priorities.",
+  "requestFramePermissions": []
+}

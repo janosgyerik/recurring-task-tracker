@@ -1,0 +1,17 @@
+{
+  "name": "Recurring Task Tracker",
+  "short_name": "Task Tracker",
+  "description": "A daily tracker for recurring tasks with customizable frequencies and priorities.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
