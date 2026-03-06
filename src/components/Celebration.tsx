@@ -12,26 +12,26 @@ interface CelebrationProps {
 export const Celebration: React.FC<CelebrationProps> = ({ isVisible, priority, onComplete }) => {
   useEffect(() => {
     if (isVisible) {
-      const duration = priority === 'high' ? 5 * 1000 : priority === 'medium' ? 3 * 1000 : 1.5 * 1000;
+      const duration = 1500;
       const animationEnd = Date.now() + duration;
       
       const triggerConfetti = () => {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return;
 
-        const particleCount = priority === 'high' ? 100 : priority === 'medium' ? 60 : 30;
+        const particleCount = priority === 'high' ? 100 : priority === 'medium' ? 80 : 30;
         
         if (priority === 'high') {
           // Gold fountain from sides to keep center clear
           confetti({
-            particleCount: particleCount / 3,
+            particleCount: particleCount / 2,
             angle: 60,
             spread: 80,
             origin: { x: 0, y: 0.7 },
             colors: ['#FFD700', '#DAA520', '#FFF8DC', '#B8860B']
           });
           confetti({
-            particleCount: particleCount / 3,
+            particleCount: particleCount / 2,
             angle: 120,
             spread: 80,
             origin: { x: 1, y: 0.7 },
