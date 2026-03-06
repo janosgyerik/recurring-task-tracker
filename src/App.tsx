@@ -11,9 +11,10 @@ import { ImportModal } from './components/ImportModal';
 import { ExportModal } from './components/ExportModal';
 import { EditTaskModal } from './components/EditTaskModal';
 import { AddTaskModal } from './components/AddTaskModal';
+import { Celebration } from './components/Celebration';
 import { CheckSquare, Calendar as CalendarIcon, ListChecks, History, ChevronDown, ChevronRight, Upload, Download, Plus, MoreVertical } from 'lucide-react';
 import { isToday, isPast, parseISO, startOfDay, format } from 'date-fns';
-import { Task, TaskDefinition } from './types';
+import { Task, TaskDefinition, Priority } from './types';
 import { sortTasks } from './lib/taskUtils';
 
 export default function App() {
@@ -25,6 +26,8 @@ export default function App() {
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [lastCompletedPriority, setLastCompletedPriority] = useState<Priority>('low');
 
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
@@ -35,6 +38,15 @@ export default function App() {
     updateTask(id, updates);
     setIsEditModalOpen(false);
     setEditingTask(null);
+  };
+
+  const handleCompleteTask = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      setLastCompletedPriority(task.priority);
+      completeTask(id);
+      setIsCelebrating(true);
+    }
   };
 
   // Filter tasks
@@ -204,7 +216,7 @@ export default function App() {
               </div>
               <TaskItems 
                 tasks={dueTasks} 
-                onComplete={completeTask} 
+                onComplete={handleCompleteTask} 
                 onUndo={undoTask}
                 onEdit={handleEditTask}
                 emptyMessage="All caught up for today! 🎉"
@@ -238,7 +250,7 @@ export default function App() {
                 <div className="px-6 pb-6 opacity-75 border-t border-gray-100 pt-4">
                   <TaskItems 
                     tasks={completedToday} 
-                    onComplete={completeTask} 
+                    onComplete={handleCompleteTask} 
                     onUndo={undoTask}
                     onEdit={handleEditTask}
                     emptyMessage="No tasks completed yet today."
@@ -276,6 +288,12 @@ export default function App() {
         task={editingTask}
         onSave={handleSaveTask}
         onDelete={deleteTask}
+      />
+
+      <Celebration 
+        isVisible={isCelebrating} 
+        priority={lastCompletedPriority}
+        onComplete={() => setIsCelebrating(false)} 
       />
 
       <AddTaskModal
