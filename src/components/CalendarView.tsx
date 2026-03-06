@@ -104,7 +104,7 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
   const renderHeader = () => (
     <div className="flex flex-col gap-4 p-4 border-b border-gray-200">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
           {format(currentDate, 'MMMM yyyy')}
         </h2>
         <div className="flex items-center gap-1">
@@ -171,7 +171,7 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
               {showHeader && (
                 <h3 
                   id={dateId}
-                  className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4 first:mt-0 scroll-mt-4"
+                  className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4 first:mt-0 scroll-mt-20"
                 >
                   {dateStr}
                 </h3>

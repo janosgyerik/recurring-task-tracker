@@ -3,16 +3,18 @@ import { Task } from '../types';
 import { cn } from '../lib/utils';
 import { CheckCircle2, Circle, Pencil } from 'lucide-react';
 import { isToday, isPast, isFuture, differenceInCalendarDays, format } from 'date-fns';
-import { calculateNextDue } from '../lib/taskUtils';
+import { calculateNextDue, formatRecurrence } from '../lib/taskUtils';
 
 interface TaskCardProps {
   task: Task;
   onComplete: (id: string) => void;
   onUndo?: (id: string) => void;
   onEdit: (task: Task) => void;
+  hideStreak?: boolean;
+  showDetails?: boolean;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete, onUndo, onEdit }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete, onUndo, onEdit, hideStreak, showDetails }) => {
   const nextDue = new Date(task.nextDue);
   const isOverdue = isPast(nextDue) && !isToday(nextDue);
   const overdueDays = isOverdue ? differenceInCalendarDays(new Date(), nextDue) : 0;
@@ -79,17 +81,24 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete, onUndo, on
               </span>
             )}
 
-            {task.streak > 0 && (
+            {task.streak > 0 && !hideStreak && (
               <span className="text-orange-500 font-medium">
                 🔥 {task.streak} streak
               </span>
             )}
 
-            {!isCompletedToday && (
-              <span className="bg-gray-50 text-gray-400 px-2 py-0.5 rounded-full font-medium border border-gray-100/50">
-                next: {format(hypotheticalNextDue, 'MMMM d')}
+            {showDetails && (
+              <span className="text-gray-400">
+                {task.preferredTime !== 'any' && (
+                  <span className="capitalize">{task.preferredTime} • </span>
+                )}
+                {formatRecurrence(task)}
               </span>
             )}
+
+            <span className="bg-gray-50 text-gray-400 px-2 py-0.5 rounded-full font-medium border border-gray-100/50">
+              next: {format(isCompletedToday ? nextDue : hypotheticalNextDue, 'MMMM d')}
+            </span>
           </div>
         </div>
       </div>

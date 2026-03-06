@@ -8,9 +8,11 @@ interface TaskItemsProps {
   onUndo?: (id: string) => void;
   onEdit: (task: Task) => void;
   emptyMessage?: string;
+  hideStreak?: boolean;
+  showDetails?: boolean;
 }
 
-export function TaskItems({ tasks, onComplete, onUndo, onEdit, emptyMessage = "No tasks found." }: TaskItemsProps) {
+export function TaskItems({ tasks, onComplete, onUndo, onEdit, emptyMessage = "No tasks found.", hideStreak, showDetails }: TaskItemsProps) {
   if (tasks.length === 0) {
     return (
       <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
@@ -28,6 +30,8 @@ export function TaskItems({ tasks, onComplete, onUndo, onEdit, emptyMessage = "N
           onComplete={onComplete}
           onUndo={onUndo}
           onEdit={onEdit}
+          hideStreak={hideStreak}
+          showDetails={showDetails}
         />
       ))}
     </div>

@@ -98,7 +98,7 @@ export default function App() {
                 Recurring Task Tracker
               </h1>
               <div className="sm:hidden">
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-lg font-semibold text-gray-900">
                   {format(new Date(), 'EEEE, MMMM d')}
                 </span>
               </div>
@@ -208,6 +208,7 @@ export default function App() {
                 onUndo={undoTask}
                 onEdit={handleEditTask}
                 emptyMessage="All caught up for today! 🎉"
+                hideStreak={true}
               />
             </section>
 
@@ -241,6 +242,7 @@ export default function App() {
                     onUndo={undoTask}
                     onEdit={handleEditTask}
                     emptyMessage="No tasks completed yet today."
+                    showDetails={true}
                   />
                 </div>
               )}

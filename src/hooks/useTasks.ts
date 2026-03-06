@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Task, Frequency, TaskDefinition, HistoryEntry } from '../types';
-import { addDays, addWeeks, addMonths, addYears, startOfDay, getDay, nextDay, getMonth, setMonth, setDate, isBefore, isSameDay, format } from 'date-fns';
+import { addDays, addWeeks, addMonths, addYears, startOfDay, getDay, nextDay, getMonth, setMonth, setDate, isBefore, isSameDay, format, parseISO } from 'date-fns';
 import { INITIAL_TASKS } from '../constants';
 import { calculateNextDue } from '../lib/taskUtils';
 
@@ -50,11 +50,14 @@ export function useTasks() {
 
         if (taskHistory && taskHistory.length > 0) {
           const lastState = taskHistory[taskHistory.length - 1];
+          const nextDue = parseISO(lastState.nextDue.split('T')[0]);
+          const isOverdue = isBefore(nextDue, today);
+          
           return {
             ...task,
             lastCompleted: lastState.completedAt || lastState.lastCompleted,
             nextDue: lastState.nextDue.split('T')[0],
-            streak: lastState.streak
+            streak: isOverdue ? 0 : lastState.streak
           };
         }
         return task;
