@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { Priority } from '../types';
@@ -10,9 +10,23 @@ interface CelebrationProps {
 }
 
 export const Celebration: React.FC<CelebrationProps> = ({ isVisible, priority, onComplete }) => {
+  const [currentEmoji, setCurrentEmoji] = useState<string>('');
+
   useEffect(() => {
     if (isVisible) {
-      const duration = 1500;
+      const animals = {
+        high: ["🐈", "🦊", "🐧", "🐉", "🐻"],
+        medium: ["🦉", "🦝", "🦁", "🐯", "🐰", "🐨"],
+        low: ["🐢", "🐸", "🐦", "🐹", "🐼"]
+      };
+      const list = animals[priority];
+      setCurrentEmoji(list[Math.floor(Math.random() * list.length)]);
+    }
+  }, [isVisible, priority]);
+
+  useEffect(() => {
+    if (isVisible) {
+      const duration = 1000;
       const animationEnd = Date.now() + duration;
       
       const triggerConfetti = () => {
@@ -39,7 +53,7 @@ export const Celebration: React.FC<CelebrationProps> = ({ isVisible, priority, o
           });
           // Add center burst
           confetti({
-            particleCount: particleCount / 3,
+            particleCount: particleCount / 2,
             spread: 70,
             origin: { y: 0.6 },
             colors: ['#FFD700', '#DAA520', '#FFF8DC', '#B8860B']
@@ -87,7 +101,7 @@ export const Celebration: React.FC<CelebrationProps> = ({ isVisible, priority, o
     switch (priority) {
       case 'high':
         return {
-          emoji: "🐈",
+          emoji: currentEmoji,
           title: "LEGENDARY!",
           subtitle: "Top priority conquered!",
           color: "text-amber-600",
@@ -96,16 +110,16 @@ export const Celebration: React.FC<CelebrationProps> = ({ isVisible, priority, o
         };
       case 'medium':
         return {
-          emoji: "🦝",
+          emoji: currentEmoji,
           title: "Great Work!",
           subtitle: "You're on a roll!",
-          color: "text-indigo-600",
-          bgColor: "bg-indigo-50",
-          borderColor: "border-indigo-200"
+          color: "text-slate-600",
+          bgColor: "bg-slate-50",
+          borderColor: "border-slate-200"
         };
       default:
         return {
-          emoji: "🐼",
+          emoji: currentEmoji,
           title: "Done!",
           subtitle: "Nice and easy.",
           color: "text-blue-600",
