@@ -22,18 +22,18 @@ import {
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, LayoutGrid, Columns, Pencil } from 'lucide-react';
 import { Task } from '../types';
 import { cn } from '../lib/utils';
-import { sortTasks } from '../lib/taskUtils';
+import { sortTasks, formatRecurrence } from '../lib/taskUtils';
 
 interface CalendarViewProps {
   tasks: Task[];
   onEdit: (task: Task) => void;
 }
 
-type ViewMode = 'schedule' | 'day' | '3day' | 'week' | 'month';
+type ViewMode = 'schedule' | '3day' | 'week' | 'month';
 
 export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<ViewMode>('month');
+  const [viewMode, setViewMode] = useState<ViewMode>('schedule');
   const [targetDate, setTargetDate] = useState<Date | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +58,6 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
       case 'month': setCurrentDate(addMonths(currentDate, 1)); break;
       case 'week': setCurrentDate(addWeeks(currentDate, 1)); break;
       case '3day': setCurrentDate(addDays(currentDate, 3)); break;
-      case 'day': setCurrentDate(addDays(currentDate, 1)); break;
       case 'schedule': break; // No navigation for simple schedule view
     }
   };
@@ -68,7 +67,6 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
       case 'month': setCurrentDate(subMonths(currentDate, 1)); break;
       case 'week': setCurrentDate(subWeeks(currentDate, 1)); break;
       case '3day': setCurrentDate(subDays(currentDate, 3)); break;
-      case 'day': setCurrentDate(subDays(currentDate, 1)); break;
       case 'schedule': break;
     }
   };
@@ -90,9 +88,6 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
       case '3day': {
         return eachDayOfInterval({ start: currentDate, end: addDays(currentDate, 2) });
       }
-      case 'day': {
-        return [currentDate];
-      }
       default:
         return [];
     }
@@ -110,7 +105,7 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
     <div className="flex flex-col gap-4 p-4 border-b border-gray-200">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-          {viewMode === 'schedule' ? 'Schedule' : format(currentDate, 'MMMM yyyy')}
+          {format(currentDate, 'MMMM yyyy')}
         </h2>
         <div className="flex items-center gap-1">
           {viewMode !== 'schedule' && (
@@ -131,7 +126,7 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
       
       {/* View Mode Selector - Scrollable on mobile */}
       <div className="flex items-center gap-1 overflow-x-auto pb-2 -mb-2 scrollbar-hide">
-        {(['schedule', 'day', '3day', 'week', 'month'] as const).map((mode) => (
+        {(['schedule', '3day', 'week', 'month'] as const).map((mode) => (
           <button
             key={mode}
             onClick={() => setViewMode(mode)}
@@ -191,7 +186,12 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
                   )} />
                   <div>
                     <div className="font-medium text-gray-900 text-sm">{task.title}</div>
-                    <div className="text-xs text-gray-500 capitalize">{task.preferredTime} • {task.frequency}</div>
+                    <div className="text-xs text-gray-500">
+                      {task.preferredTime !== 'any' && (
+                        <span className="capitalize">{task.preferredTime} • </span>
+                      )}
+                      {formatRecurrence(task)}
+                    </div>
                   </div>
                 </div>
                 <button
@@ -212,14 +212,13 @@ export function CalendarView({ tasks, onEdit }: CalendarViewProps) {
   const renderGridView = () => {
     const days = getDaysToRender();
     const isMonth = viewMode === 'month';
-    const gridCols = viewMode === 'day' ? 'grid-cols-1' : 
-                     viewMode === '3day' ? 'grid-cols-3' : 
+    const gridCols = viewMode === '3day' ? 'grid-cols-3' : 
                      'grid-cols-7';
 
     return (
       <>
         <div className={cn("grid text-center text-xs font-medium text-gray-500 bg-gray-50 border-b border-gray-200", gridCols)}>
-          {days.slice(0, viewMode === 'day' ? 1 : viewMode === '3day' ? 3 : 7).map(day => (
+          {days.slice(0, viewMode === '3day' ? 3 : 7).map(day => (
             <div key={day.toString()} className="py-2">
               {format(day, 'EEE')}
             </div>

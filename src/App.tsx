@@ -11,8 +11,8 @@ import { ImportModal } from './components/ImportModal';
 import { ExportModal } from './components/ExportModal';
 import { EditTaskModal } from './components/EditTaskModal';
 import { AddTaskModal } from './components/AddTaskModal';
-import { CheckSquare, Calendar as CalendarIcon, ListChecks, History, ChevronDown, ChevronRight, Upload, Download, Plus } from 'lucide-react';
-import { isToday, isPast, parseISO, startOfDay } from 'date-fns';
+import { CheckSquare, Calendar as CalendarIcon, ListChecks, History, ChevronDown, ChevronRight, Upload, Download, Plus, MoreVertical } from 'lucide-react';
+import { isToday, isPast, parseISO, startOfDay, format } from 'date-fns';
 import { Task, TaskDefinition } from './types';
 import { sortTasks } from './lib/taskUtils';
 
@@ -23,6 +23,7 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const handleEditTask = (task: Task) => {
@@ -92,9 +93,16 @@ export default function App() {
             <div className="bg-indigo-600 p-2 rounded-lg">
               <CheckSquare className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight hidden sm:block">
-              Recurring Task Tracker
-            </h1>
+            <div className="flex flex-col items-start">
+              <h1 className="text-xl font-bold text-gray-900 tracking-tight hidden sm:block">
+                Recurring Task Tracker
+              </h1>
+              <div className="sm:hidden">
+                <span className="text-sm font-semibold text-gray-900">
+                  {format(new Date(), 'EEEE, MMMM d')}
+                </span>
+              </div>
+            </div>
           </button>
           
           <div className="flex items-center gap-4">
@@ -105,22 +113,71 @@ export default function App() {
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">New Task</span>
             </button>
-            <button
-              onClick={() => setIsImportModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
-            >
-              <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">Import</span>
-            </button>
-            <button
-              onClick={() => setIsExportModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Export</span>
-            </button>
+            
+            {/* Desktop Import/Export Buttons */}
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={() => setIsImportModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+                title="Import tasks"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Import</span>
+              </button>
+              <button
+                onClick={() => setIsExportModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+                title="Export tasks"
+              >
+                <Download className="w-4 h-4" />
+                <span>Export</span>
+              </button>
+            </div>
+            
+            {/* Mobile Triple Dot Menu */}
+            <div className="relative md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+                title="More options"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
+              
+              {isMenuOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-10" 
+                    onClick={() => setIsMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 overflow-hidden">
+                    <button
+                      onClick={() => {
+                        setIsImportModalOpen(true);
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Upload className="w-4 h-4 text-gray-400" />
+                      Import Tasks
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsExportModalOpen(true);
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Download className="w-4 h-4 text-gray-400" />
+                      Export Tasks
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
             <div className="text-sm text-gray-500 hidden sm:block">
-              {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+              {format(new Date(), 'EEEE, MMMM d')}
             </div>
           </div>
         </div>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Task, Frequency, Priority, TimeOfDay, TaskDefinition } from '../types';
-import { X } from 'lucide-react';
-import { format } from 'date-fns';
+import { X, RotateCcw } from 'lucide-react';
+import { format, parseISO, startOfDay, isSameDay, subDays } from 'date-fns';
 import { DatePicker } from './DatePicker';
+import { calculateNextDue } from '../lib/taskUtils';
 
 interface EditTaskModalProps {
   isOpen: boolean;
@@ -81,6 +82,33 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, t
         console.error("Delete failed", err);
       }
     }
+  };
+  
+  const handleResetSchedule = () => {
+    if (!task) return;
+    
+    // Use today as the base for a fresh reset, 
+    // but if the task was completed today, we should probably calculate from that completion
+    // to avoid double-scheduling for today.
+    const today = startOfDay(new Date());
+    const lastCompletedDate = task.lastCompleted ? startOfDay(parseISO(task.lastCompleted)) : null;
+    
+    // If completed today, use today as base (so nextDue will be in the future)
+    // If not completed today, we use subDays(today, 1) so that calculateNextDue 
+    // can potentially return 'today' if it's a valid day.
+    const baseDate = (lastCompletedDate && isSameDay(lastCompletedDate, today)) 
+      ? today 
+      : subDays(today, 1);
+      
+    const recalculated = calculateNextDue(
+      baseDate,
+      formData.frequency || task.frequency,
+      formData.weekDays || task.weekDays,
+      formData.months || task.months,
+      formData.interval || task.interval
+    );
+    
+    handleChange('nextDue', format(recalculated, 'yyyy-MM-dd'));
   };
 
   return (
@@ -215,11 +243,24 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, t
 
           {/* Next Due Date Section */}
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-            <DatePicker
-              label="Next Due Date (YYYY/MM/DD)"
-              value={formData.nextDue || ''}
-              onChange={val => handleChange('nextDue', val)}
-            />
+            <div className="flex items-end gap-4">
+              <div className="flex-grow">
+                <DatePicker
+                  label="Next Due Date (YYYY/MM/DD)"
+                  value={formData.nextDue || ''}
+                  onChange={val => handleChange('nextDue', val)}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleResetSchedule}
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition-colors cursor-pointer mb-1 whitespace-nowrap"
+                title="Recalculate based on task definition"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Reset
+              </button>
+            </div>
             <p className="text-xs text-gray-500 mt-2">
               Changing this will manually reschedule the task. The streak will be preserved.
             </p>
